@@ -1,0 +1,390 @@
+<!doctype html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+        <!--<link rel="stylesheet" href="css/main.css">-->
+        <style>
+            body {
+                padding-top: 60px;
+                padding-bottom: 10px;
+                background-color: #000000;
+                overflow: hidden;
+            }
+            .centerri {
+                margin-left: auto;
+                margin-right: auto;
+            }
+            ul.dropdown-menu {
+                background-color: black;
+                color: yellow;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <nav  class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#" id="headeri">Images</a>
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#mediamenus">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span> 
+                </button>
+            </div>
+            <div id="mediamenus">
+                <ul class="nav navbar-nav">
+                    <!--<li id="pics_navig" class="active navig"><a href="#">Pictures</a></li>-->
+                    <li id="pics_navig_dd" class="dropdown navig">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Images
+                        <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <!--<li class="pic_selection"><a href="#">aaahh</a></li>-->
+                        </ul>
+                    </li>
+
+                    <li id="vids_navig_dd">
+                      <a href="videos.html">Videos</a>
+                    </li>
+
+                </ul>
+            </div>
+          </div>
+        </nav>
+
+    <div class="container-fluid">
+      <div class="row pics">
+        <div id="div1" class="col-xs-10">
+          <img id="BigPic1" src="#" class="centerri img-responsive img-rounded">
+        </div>
+        <div id="piclist" class="col-xs-2">
+            <img style="padding-bottom: 5px" id="pic1" src="#" class="img-responsive img-rounded piclistimg">
+            <img style="padding-bottom: 5px" id="pic2" src="#" class="img-responsive img-rounded piclistimg">
+            <img style="padding-bottom: 5px" id="pic3" src="#" class="img-responsive img-rounded piclistimg">
+            <img style="padding-bottom: 5px" id="pic4" src="#" class="img-responsive img-rounded piclistimg">
+            <img style="padding-bottom: 5px" id="pic5" src="#" class="img-responsive img-rounded piclistimg">
+            <img style="padding-bottom: 5px" id="pic6" src="#" class="img-responsive img-rounded piclistimg">
+            <img style="padding-bottom: 5px" id="pic7" src="#" class="img-responsive img-rounded piclistimg">
+        </div>
+      </div>
+      <div class="row vids">
+        <div id="divVids" class="col-xs-10">
+          <img id="BigVid1" src="" class="centerri img-responsive img-rounded">
+        </div>
+        <div id="vidlist" class="col-xs-2">
+            <img style="padding-bottom: 5px" id="vid1" src="#" class="img-responsive img-rounded piclistimg">
+            <img style="padding-bottom: 5px" id="vid2" src="#" class="img-responsive img-rounded piclistimg">
+            <img style="padding-bottom: 5px" id="vid3" src="#" class="img-responsive img-rounded piclistimg">
+            <img style="padding-bottom: 5px" id="vid4" src="#" class="img-responsive img-rounded piclistimg">
+            <img style="padding-bottom: 5px" id="vid5" src="#" class="img-responsive img-rounded piclistimg">
+            <img style="padding-bottom: 5px" id="vid6" src="#" class="img-responsive img-rounded piclistimg">
+            <img style="padding-bottom: 5px" id="vid7" src="#" class="img-responsive img-rounded piclistimg">
+        </div>
+      </div>
+    </div>
+
+    <!-- /container -->        
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.js"><\/script>');</script>
+        <script>
+            var PICS = 1;
+            var VIDS = 2;
+            var SELECTED_MEDIA = 0;
+            var NBR_OF_VISIBLE_PICS = 7;
+            var picArray = null;
+            var bigPicObj = new BigPic();
+            var scroller = new Scroller();
+            var picListObj = new PicList();
+
+            $(document).ready(function(){
+                hideAllPics(0);
+                hideAllRows();
+                updateDropdownMenus();
+            });
+            $(window).resize(function() {bigPicObj.setBigPicSize();});
+
+            function hideAllPics(delay) {
+                picListObj.hidePics(delay);
+                bigPicObj.hideBigPic(delay);
+            }
+            
+            function hideAllRows() {
+                $(".pics").fadeOut(0);
+                $(".vids").fadeOut(0);
+            }
+            
+            function selectVids(delay) {
+                if( SELECTED_MEDIA == VIDS)
+                    return;
+
+                $(".active.navig").removeClass("active");
+                $("#vids_navig_dd").addClass("active");
+
+                SELECTED_MEDIA = VIDS;
+                hideAllPics();
+                $(".pics").fadeOut(0);
+                $(".vids").fadeIn(0);
+            }
+            function selectPics(delay) {
+                if( SELECTED_MEDIA == PICS)
+                    return;
+                hideAllPics(0);
+                $(".active.navig").removeClass("active");
+                $("#pics_navig_dd").addClass("active");
+                SELECTED_MEDIA = PICS;
+                $(".vids").fadeOut(0);
+                $(".pics").fadeIn(0);
+            }
+
+
+            /************ MENUS ******************************************/
+            
+            function updateDropdownMenus() {
+                $.get( "NewServlet/getimagedirs", function( data ) {
+                    updatePicsDropDownMenu(data);
+                }, "json");
+            }
+            
+            function updatePicsDropDownMenu(jsonData) {
+                    if(jsonData.length > 0) {
+//                        $("#pics_navig").addClass("hidden");
+//                        $("#pics_navig_dd").removeClass("hidden");
+                        $("#pics_navig_dd > ul").children().remove();
+                        var x;
+                        for (x in jsonData) {
+                            var str = jsonData[x];
+                            var name = str.slice(str.lastIndexOf('/')+1,str.length);
+                            $("#pics_navig_dd > ul").append(
+                                    " <li onclick=\"picFolderSelected('"+str+" ')\" dirpath=\"" + str + "\" class=\"pic_selection\"><a href='#' style='color: grey'>" + name +"</a></li>");
+                        }
+                    }
+//                    else{
+//                        $("#pics_navig").removeClass("hidden");
+//                        $("#pics_navig_dd").addClass("hidden");
+//                    }
+            }
+            
+            function picFolderSelected(str) {
+                selectPics(0);
+                $.ajax({
+                    url: "NewServlet/getdirimages",
+                    type: "get",
+                    data:{directory:  str.trim()},
+                    dataType: 'json',
+                    success: function(data) {
+//{"src":"http:\/\/localhost:8080\/imgviewer\/pics\/pics01\/JADED.jpg","width":600,"height":535}
+                        if(data.length > 0) {
+                            picArray = data;
+                            picListObj.deployPics(data);
+                        }
+                    },
+                    error: function(xhr) {
+                        alert("error");
+                        alert(xhr);
+                    }
+                });
+            }
+            
+            
+            /************ PIC LIST ***************************************/
+            function PicList() {
+                this.deployPics = function deployPics(jsonData) {
+                    var hidingTime = 1000;
+                    if(bigPicObj.imgNotSet())
+                        hidingTime = 0;
+                    bigPicObj.hideBigPic(hidingTime);
+                    this.hidePics(hidingTime);
+                    setTimeout( function() {
+                        for (var x in jsonData) {
+                            var pic = jsonData[x];
+                            var picIndex = parseInt(x,10)+1;
+                            if(picIndex > NBR_OF_VISIBLE_PICS)
+                                break;
+                            $("#pic"+picIndex).attr("src", pic.src);
+                            $("#pic"+picIndex).fadeIn(1000);
+                        }
+                        bigPicObj.setBigPic(null);
+                        bigPicObj.fadeInBigImg();
+                    }, hidingTime);
+                    showPicsRow(3000);
+                };
+                this.hidePics = function hidePics(delay) {
+                    var x = 1;
+                    for(;x<=NBR_OF_VISIBLE_PICS;x++)
+                        $("#pic"+x).fadeOut(delay);
+                };
+            }
+
+            
+            /************ BIG PIC HANDLING *******************************/
+            function BigPic() {
+                this.bigImg = null;
+                this.bigImgSelectedFromPicList = function (src) {
+                    if(this.bigImg.src != src)
+                        this.changeBigPic(src);
+                };
+                this.imgNotSet = function () {
+                    return this.bigImg == null;
+                };
+                this.setBigPic = function (src) {
+                    if(src != null)
+                        this.bigImg = this.getPicObj(src);
+                    else
+                        if( picArray != null)
+                            if( picArray.length > 0)
+                                this.bigImg = picArray[0];
+                    $("#BigPic1").attr("src", this.bigImg.src);
+                    this.setBigPicSize();
+                };    
+                this.changeBigPic = function (src) {
+                    this.fadeOutBigImg(600);
+                    setTimeout( function() {
+                        bigPicObj.setBigPic(src);
+                        bigPicObj.fadeInBigImg();
+                    }, 625);
+                };
+                this.fadeInBigImg = function () {
+                    $("#BigPic1").fadeIn(1000);
+                };
+                this.fadeOutBigImg = function (delay) {
+                    $("#BigPic1").fadeOut(delay);
+                    this.bigImg = null;
+                };
+                this.getPicObj = function (str) {
+                    for(obj in picArray)
+                        if(picArray[obj].src === str)
+                            return picArray[obj];
+                };
+                this.setBigPicSize = function () {
+                    if( picArray == null )
+                        return;
+                    if(this.bigImg == null)
+                        return;
+                    var maxH = ($(window).height()-70);
+                    var maxW = $("#div1").prop("clientWidth")-10;
+                    var aspRatH = maxH / this.bigImg.height;
+                    var aspRatW = maxW / this.bigImg.width;
+                    var aspRat = Math.min(aspRatH, aspRatW);
+                    $("#BigPic1").css("height", this.bigImg.height * aspRat );
+                    $("#BigPic1").css("width",  this.bigImg.width  * aspRat );
+                };
+                this.hideBigPic = function hideBigPic(delay) {
+                    bigPicObj.fadeOutBigImg(delay);
+                };
+            }
+            
+            /************ SCROLL PICS *******************************/
+            function Scroller() {
+                this.scrollPos = 0;
+                this.getInfo = function() {
+                    return this.color + ' ' + this.type + ' apple';
+                };
+                this.picsDown = function() {
+                    this.scrollPos++;
+                    if(this.scrollPos >= picArray.length)
+                        this.scrollPos = 0;
+                    this.scrollPics(this.scrollPos);
+                };
+                this.picsUp = function() {
+                    this.scrollPos--;
+                    if(this.scrollPos < 0)
+                        this.scrollPos = picArray.length-1;
+                    this.scrollPics(this.scrollPos);
+                };
+                this.scrollPics = function (scrollPosition) {
+                    var x = 1;
+                    for(; x <= picArray.length; x++)
+                        if(x<=NBR_OF_VISIBLE_PICS)
+                            $("#pic"+x).attr("src", picArray[((scrollPosition+(x-1))%picArray.length)].src);
+                };
+            }
+    
+            /************ EVENT HANDLERS *******************************/
+            $('body').bind('mousewheel', function(e){
+                if(e.originalEvent.wheelDelta /120 < 0)
+                    scroller.picsDown();
+                else
+                    scroller.picsUp();
+            });
+            $(".piclistimg").click(function(){
+                bigPicObj.bigImgSelectedFromPicList($(this).attr("src"));
+            });
+            $( "body" ).keydown(function( event ) {
+              if ( event.which == 33 || event.which == 38 )
+                 scroller.picsUp();
+              if ( event.which == 34 || event.which == 40 )
+                 scroller.picsDown();
+            });
+
+        </script>
+        <script src="js/vendor/bootstrap.min.js"></script>
+        <script src="js/main.js"></script>
+        <script src="js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+            (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+            e.src='//www.google-analytics.com/analytics.js';
+            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+            ga('create','UA-XXXXX-X','auto');ga('send','pageview');
+        </script>
+    </body>
+</html>
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+<!--    <div class="jumbotron">
+      <div class="container" >
+        <h1 class="hide">Hello, world!</h1>
+        <p class="hide"><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p>
+        <img style="height: 200px" id="jumbo" src="img/images.jpg" class="img-responsive img-rounded">
+      </div>
+    </div>-->
+<!--    <div class="container">
+      <div class="row">
+        <div id="div1" class="col-sm-4">
+          <a id="pic1" class="btn btn-default" href="#" role="button">See it... &raquo;</a>
+          <img id="pic1" src="img/blonde woman.jpg" class="img-responsive img-rounded">
+        </div>
+        <div id="div2" class="col-sm-4">
+          <a id="a2" class="btn btn-default" href="#" role="button">See it... &raquo;</a>
+          <img id="a2" src="img/db740c22af5ee9a54709bb39970eece2.jpg" class="img-responsive img-rounded">
+        </div>
+        <div class="col-sm-4">
+          <a id="a3" class="btn btn-default" href="#" role="button">See it... &raquo;</a>
+          <div id="div3" >
+            <img id="a3" src="img/images.jpg" class="img-responsive img-rounded">
+          </div>
+        </div>
+    </div>
+
+//            $("#pic1").attr("src", picArray[0].src);
+//            $("#pic1").removeClass("hidden");
+//            $("#pic2").attr("src", picArray[1].src);
+//            $("#pic2").removeClass("hidden");
+//            $("#pic3").attr("src", picArray[2].src);
+//            $("#pic3").removeClass("hidden");
+//            $("#pic4").attr("src", picArray[3].src);
+//            $("#pic4").removeClass("hidden");
+//            $(".navig").click(function(){
+//                $(".active.navig").removeClass("active");
+//                $(this).addClass("active");
+//            });
+
+
+//            var picsText = '{"pics":[' +
+//                '{"src":"img/db740c22af5ee9a54709bb39970eece2.jpg","width":"236","height":"354" },' +
+//                '{"src":"img/images.jpg","width":"284","height":"177" },' +
+//                '{"src":"img/depositphotos_4003251-Woman-guitarist.jpg","width":"1024","height":"1024" },' +
+//                '{"src":"img/blonde woman.jpg","width":"465","height":"700" }]}';
+//            var picArrayTemp = JSON.parse(picsText);
+//            var picArray = picArrayTemp.pics;
+
+
+
+-->
+

@@ -1,0 +1,141 @@
+<!doctype html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="bower_components/mediaelement/build/mediaelementplayer.css" />
+        <style>
+            body {
+                padding-top: 60px;
+                padding-bottom: 10px;
+                background-color: black;
+                overflow: hidden;
+            }
+            .vidisItem {
+                background: black;
+                letter-spacing: -1px;
+                /*width: 100%*/
+                color: red;
+                border: 0px solid;
+                padding: 0px 0px 0px 0px;
+                font-family: inherit;
+            }
+            .dropdown-menu {
+                background-color: black;
+            }
+        </style>
+    </head>
+    
+    <body id="bodyElem" ng-app="myNavMenu" ng-controller="myNavMenuCont" ng-keydown="keyDown($event)"> 
+        <nav  class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="" id="headeri">Videos</a>
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#mediamenus">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span> 
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse" id="mediamenus">
+                    <ul class="nav navbar-nav">
+                        <li id="pics_navig_dd">
+                            <a href="images.html">Pictures</a>
+                        </li>
+                        <li class="active dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="">Videos
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li ng-repeat="path in imgs" ng-click="menuClick(path)"> 
+                                    <a href="" style="color: grey">{{path.slice(path.lastIndexOf('/')+1,path.length)}}</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+ 
+        <div class="container-fluid">
+            <div class="row">
+                <div id="vidlistDiv" class="col-xs-5 col-sm-4 col-md-3 col-lg-2" hidden>
+                    <div ng-repeat="vid in videoList">
+                        <button type="button" class="vidisItem" ng-click="videoSelected(vid)"> 
+                            {{vid.src.slice(vid.src.lastIndexOf('/')+1,vid.src.length)}} </button>
+                    </div>
+                </div>
+                <div id="div1" class="col-xs-7 col-sm-8 col-md-9 col-lg-10" style="overflow: hidden;">
+                    <div id="vidPlayer" hidden>
+                        <video src="http://localhost:8080/imgviewer/vids/vidi03/Clip_480_5sec_6mbps_h264.mp4" controls style="width: 100%; height: 100%;"></video>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="js/vendor/jquery-1.11.2.js"></script>
+        <script src="js/vendor/bootstrap.min.js"></script>
+        <script src="js/vendor/angular.js"></script>
+        <script src="bower_components/mediaelement/build/mediaelement-and-player.js"></script>
+        <script src="js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+        <script src="js/utils.js"></script>
+        
+        <script>
+            $(document).ready(function(){
+                $('video').mediaelementplayer({});
+            });
+            
+            $(document).bind('mousewheel', function(e){
+                var scope = angular.element($("#bodyElem")).scope();
+                if(e.originalEvent.wheelDelta /120 < 0)
+                    scope.scrollUp();
+                else
+                    scope.scrollDown();
+                scope.$apply();
+            });
+            
+            var app = angular.module('myNavMenu', []);
+            app.controller('myNavMenuCont', function($scope, $http) {
+                $http.get("NewServlet/getvideodirs")
+                    .success(function(response) {
+                        $scope.imgs = response;
+                    });
+                $scope.menuClick = function(path) {
+                    $http.get("NewServlet/getdirvideos?directory="+path)
+                        .success(function(response) {
+                            $("#vidlistDiv").fadeOut(0);
+                            $scope.videoList = response;
+                            $("#vidlistDiv").fadeIn(800);
+                        });
+                };
+                $scope.videoSelected = function(video) {
+                    $("#vidPlayer").fadeOut(800);
+                    setTimeout( function() {
+                        $("video").attr("src", video.src);
+                        $("#vidPlayer").fadeIn(800);
+                    }, 800);
+                }
+                $scope.keyDown = function($event) {
+                    if ($event.keyCode == 38)
+                        $scope.scrollDown();
+                    else if ($event.keyCode == 40)
+                        $scope.scrollUp();
+                }
+                $scope.scrollUp = function() {
+                    if($scope.videoList != undefined)
+                        $scope.videoList.push( $scope.videoList.shift() );
+                }
+                $scope.scrollDown = function() {
+                    if($scope.videoList != undefined)
+                        $scope.videoList.unshift( $scope.videoList.pop() );
+                }
+            });
+        </script>
+    </body>
+</html>
+
+<!--    <video src="http://www.w3schools.com/html/movie.mp4"></video>        -->
