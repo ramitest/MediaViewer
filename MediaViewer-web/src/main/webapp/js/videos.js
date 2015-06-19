@@ -1,5 +1,5 @@
     $(document).ready(function(){
-        $('video').mediaelementplayer({});
+//        $('video').mediaelementplayer({});
     });
 
     $(document).bind('mousewheel', function(e){
@@ -26,9 +26,11 @@
                 });
         };
         $scope.videoSelected = function(video) {
+            console.log(video.src);
             $("#vidPlayer").fadeOut(800);
             setTimeout( function() {
                 $("video").attr("src", video.src);
+                $('video').mediaelementplayer({});
                 $("#vidPlayer").fadeIn(800);
             }, 800);
         };

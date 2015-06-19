@@ -19,13 +19,15 @@ public abstract class AbstractReader {
     private static String PICS_DIR = "pics";
     private static String VIDS_DIR = "vids";
 //    private static String imgRootDir  = System.getProperty("my.imgviewer.imgdir");
+//    private static String urlRootPath = System.getProperty("my.imgviewer.urlpathroot");
     private static String imgRootDir;
-    private static String urlRootPath = System.getProperty("my.imgviewer.urlpathroot");
+    private static String urlRootPath;
 
-    AbstractReader(String mediaRootDir) {
-        this.imgRootDir = mediaRootDir;
+    AbstractReader(String mediaRootDir, String urlRootPath) {
+        this.imgRootDir  = mediaRootDir;
+        this.urlRootPath = urlRootPath;
     }
-    
+
     protected static String getPicsDir(){
         return PICS_DIR;
     }
@@ -33,15 +35,15 @@ public abstract class AbstractReader {
     protected static String getVidsDir(){
         return VIDS_DIR;
     }
-    
+
     protected static String getMediaFilesRootDir(){
         return imgRootDir;
     }
-    
+
     protected static String getURLRootPath(){
         return urlRootPath;
     }
-    
+
     protected static String addBSlashToEnd(String str) {
         return addStrToEndIfNotExists(str, "\\");
     }
@@ -55,7 +57,7 @@ public abstract class AbstractReader {
             return str;
         return str.concat(endStr);
     }
-    
+
     protected static String replaceSlashtoBSlash(String str) {
         System.out.println("replaceSlashtoBSlash:::: " +str);
         str = str.replace("/", "\\");
@@ -107,12 +109,12 @@ public abstract class AbstractReader {
         String subPath = getSubPathFromDiskFullPath(fileName, getMediaFilesRootDir());
 //        "http://"+ localhost+":"+8080+"/imgviewer/";
         
-        return urlRootPath + subPath;
+        return getURLRootPath() + subPath;
     }
 
     public static JSONArray getSubPathsDirs(String subDir) throws IOException {
         System.out.println("imgRootDir:" + getMediaFilesRootDir());
-        System.out.println("urlRootPath:" + urlRootPath);
+        System.out.println("urlRootPath:" + getURLRootPath());
         if (isDir(Paths.get(getMediaFilesRootDir()))) {
             for (Path dir : getDirStream(Paths.get(getMediaFilesRootDir()))) {
                 System.out.println(dir);

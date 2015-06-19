@@ -33,24 +33,24 @@ public class MediaViewerServlet extends HttpServlet {
             
             switch ( pathInfo.toLowerCase() ) {
                 case "/getimagedirs":
-                    out.println( new ImageReader(getMedRootDir()).getSubPathsOfPicsDirs() );
+                    out.println( new ImageReader(getMedRootDir(), getMedRootDir(request)).getSubPathsOfPicsDirs() );
                     break;
                 case "/getdirimages":
                     String dir = request.getParameter("directory");
-                    out.println(new ImageReader(getMedRootDir()).getPicsFromDir(dir, false));
+                    out.println(new ImageReader(getMedRootDir(), getMedRootDir(request)).getPicsFromDir(dir, false));
                     break;
                 case "/getvideodirs":
-                    out.println(new VideoReader(getMedRootDir()).getSubPathsOfVidsDirs() );
+                    out.println(new VideoReader(getMedRootDir(), getMedRootDir(request)).getSubPathsOfVidsDirs() );
                     break;
                 case "/getdirvideos":
                     dir = request.getParameter("directory");
-                    out.println(new VideoReader(getMedRootDir()).getVidsFromDir(dir, false));
+                    out.println(new VideoReader(getMedRootDir(), getMedRootDir(request)).getVidsFromDir(dir, false));
                     break;
             }
         }
     }
     
-    String getMedRootDir() {
+    protected String getMedRootDir() {
         String mediaDir = System.getProperty("my.imgviewer.imgdir");
         System.out.println("sys prop media dir:: " + mediaDir );
         if(mediaDir == null) {
@@ -60,7 +60,10 @@ public class MediaViewerServlet extends HttpServlet {
         return mediaDir;
     }
 
-    
+    protected String getMedRootDir(HttpServletRequest request) {
+        return "http://"+ request.getServerName()+":"+request.getServerPort()+"/imgviewer/";
+    }
+
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -99,5 +102,4 @@ public class MediaViewerServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }

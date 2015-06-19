@@ -10,8 +10,8 @@ import org.json.simple.*;
 
 public class VideoReader extends AbstractReader {
 
-    VideoReader(String mediaRootDir) {
-        super(mediaRootDir);
+    VideoReader(String mediaRootDir, String urlRootPath) {
+        super(mediaRootDir, urlRootPath);
     }
 
     public JSONArray getSubPathsOfVidsDirs() throws IOException {
