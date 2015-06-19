@@ -11,6 +11,10 @@ import org.json.simple.*;
 
 public class ImageReader extends AbstractReader {
 
+    ImageReader(String mediaRootDir) {
+        super(mediaRootDir);
+    }
+
     public JSONArray getSubPathsOfPicsDirs() throws IOException {
         return getSubPathsDirs(getPicsDir());
     }

@@ -29,24 +29,35 @@ public class MediaViewerServlet extends HttpServlet {
             String pathInfo = request.getPathInfo();
             System.out.println(request.getRequestURL());
             System.out.println(pathInfo);
-            System.out.println("Host n Port:: "+request.getServerName()+":"+request.getServerPort());
+            System.out.println("Host and Port:: " + request.getServerName()+":"+request.getServerPort());
+            
             switch ( pathInfo.toLowerCase() ) {
                 case "/getimagedirs":
-                    out.println( new ImageReader().getSubPathsOfPicsDirs() );
+                    out.println( new ImageReader(getMedRootDir()).getSubPathsOfPicsDirs() );
                     break;
                 case "/getdirimages":
                     String dir = request.getParameter("directory");
-                    out.println(new ImageReader().getPicsFromDir(dir, false));
+                    out.println(new ImageReader(getMedRootDir()).getPicsFromDir(dir, false));
                     break;
                 case "/getvideodirs":
-                    out.println(new VideoReader().getSubPathsOfVidsDirs() );
+                    out.println(new VideoReader(getMedRootDir()).getSubPathsOfVidsDirs() );
                     break;
                 case "/getdirvideos":
                     dir = request.getParameter("directory");
-                    out.println(new VideoReader().getVidsFromDir(dir, false));
+                    out.println(new VideoReader(getMedRootDir()).getVidsFromDir(dir, false));
                     break;
             }
         }
+    }
+    
+    String getMedRootDir() {
+        String mediaDir = System.getProperty("my.imgviewer.imgdir");
+        System.out.println("sys prop media dir:: " + mediaDir );
+        if(mediaDir == null) {
+            mediaDir = getServletConfig().getInitParameter("my.imgviewer.imgdir");
+            System.out.println("init param media dir:: " + mediaDir );
+        }
+        return mediaDir;
     }
 
     

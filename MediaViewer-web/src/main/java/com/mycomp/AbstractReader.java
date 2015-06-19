@@ -18,9 +18,13 @@ public abstract class AbstractReader {
 
     private static String PICS_DIR = "pics";
     private static String VIDS_DIR = "vids";
-    private static String imgRootDir  = System.getProperty("my.imgviewer.imgdir");
+//    private static String imgRootDir  = System.getProperty("my.imgviewer.imgdir");
+    private static String imgRootDir;
     private static String urlRootPath = System.getProperty("my.imgviewer.urlpathroot");
 
+    AbstractReader(String mediaRootDir) {
+        this.imgRootDir = mediaRootDir;
+    }
     
     protected static String getPicsDir(){
         return PICS_DIR;
@@ -39,19 +43,29 @@ public abstract class AbstractReader {
     }
     
     protected static String addBSlashToEnd(String str) {
-        if (str.endsWith("\\")) {
-            return str;
-        }
-        return str.concat("\\");
+        return addStrToEndIfNotExists(str, "\\");
     }
 
+    protected static String addSlashToEnd(String str) {
+        return addStrToEndIfNotExists(str, "/");
+    }
+
+    protected static String addStrToEndIfNotExists(String str, String endStr) {
+        if (str.endsWith(endStr))
+            return str;
+        return str.concat(endStr);
+    }
+    
     protected static String replaceSlashtoBSlash(String str) {
-        System.out.println("replaceSlashtoBSlash::::" +str);
-        return str.replace("/", "\\");
+        System.out.println("replaceSlashtoBSlash:::: " +str);
+        str = str.replace("/", "\\");
+        return str.replace("\\\\", "\\");
     }
 
     protected static String replaceBSlashtoSlash(String str) {
-        return str.replace("\\", "/");
+        System.out.println("replaceBSlashtoSlash:::: " +str);
+        str = str.replace("\\", "/");
+        return str.replace("//", "/");
     }
 
     protected static String getSubPathFromDiskFullPath(String fileName, String strRootPath) {
@@ -131,10 +145,11 @@ public abstract class AbstractReader {
     protected abstract List<String> getMediaFileEnds();
 
     public JSONArray getMediaFilesFromDir(String mediaDir, boolean fullPath) throws IOException {
-        System.out.println(mediaDir);
+        System.out.println("getMediaFilesFromDir::" + mediaDir);
         if (false == fullPath) {
-            mediaDir = addBSlashToEnd(getMediaFilesRootDir()) + replaceSlashtoBSlash(mediaDir);
+            mediaDir = getFullMediaDir(mediaDir);
         }
+        System.out.println("getMediaFilesFromFullDir::" + mediaDir);
         JSONArray mediaFilesJson = new JSONArray();
         if (isDir(Paths.get(mediaDir))) {
             for (Path imgPath : getStream(Paths.get(mediaDir))) {
@@ -142,6 +157,13 @@ public abstract class AbstractReader {
             }
         }
         return mediaFilesJson;
+    }
+    
+    protected String getFullMediaDir(String relativePath) {
+        String osName = System.getProperty("os.name").toLowerCase();
+        if(osName.indexOf("win") >= 0)
+            return addBSlashToEnd(getMediaFilesRootDir()) + replaceSlashtoBSlash(relativePath);
+        return addSlashToEnd(getMediaFilesRootDir()) + replaceBSlashtoSlash(relativePath);
     }
 
     protected DirectoryStream<Path> getStream(Path dirPath) throws IOException {

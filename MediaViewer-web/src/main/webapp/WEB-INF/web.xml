@@ -3,6 +3,10 @@
     <servlet>
         <servlet-name>MediaViewerServlet</servlet-name>
         <servlet-class>com.mycomp.MediaViewerServlet</servlet-class>
+        <init-param>
+            <param-name>my.imgviewer.imgdir</param-name>
+            <param-value>/home/tomcat/imgviewer</param-value>
+        </init-param>
     </servlet>
     <servlet-mapping>
         <servlet-name>MediaViewerServlet</servlet-name>
